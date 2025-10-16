@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduNotes - College Notes Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .copyright {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo i {
+            color: #fdbb2d;
+            font-size: 32px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #fdbb2d;
+            color: #1a2a6c;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+        }
+
+        .feature-card:hover {
+            transform: perspective(1000px) rotateY(5deg) rotateX(5deg) translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card i {
+            font-size: 40px;
+            color: #fdbb2d;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .notes-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .note-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            cursor: pointer;
+        }
+
+        .note-card:hover {
+            transform: perspective(1000px) rotateY(5deg) translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .note-card h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .note-card p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .note-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .upload-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .upload-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .contact-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }
+
+        .contact-item i {
+            font-size: 24px;
+            color: #fdbb2d;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 50px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) rotateY(0deg);
+            animation: modalAppear 0.5s ease;
+        }
+
+        @keyframes modalAppear {
+            0% {
+                transform: perspective(1000px) rotateY(90deg) scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: perspective(1000px) rotateY(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #fdbb2d;
+        }
+
+        .note-content {
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        .note-content h2 {
+            margin-bottom: 15px;
+            color: #fdbb2d;
+        }
+
+        .note-content p {
+            margin-bottom: 15px;
+        }
+
+        .floating-elements {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+            }
+        }
+
+        /* Disable text selection */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="no-select">
+    <!-- Watermark -->
+    <div class="watermark">TaskDrift</div>
+    
+    <!-- Copyright -->
+    <div class="copyright">© 2023 EduNotes. All rights reserved.</div>
+    
+    <!-- Floating 3D elements -->
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>EduNotes</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#notes">Notes</a></li>
+                    <li><a href="#upload">Upload</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>College Notes Made Simple</h1>
+            <p>Access, share, and collaborate on study materials with fellow students. Enhance your learning experience with our interactive platform.</p>
+            <a href="#notes" class="btn">Explore Notes</a>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <i class="fas fa-book-open"></i>
+                <h3>Extensive Library</h3>
+                <p>Access a wide range of notes from various subjects and courses shared by students across different semesters.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-share-alt"></i>
+                <h3>Easy Sharing</h3>
+                <p>Upload your own notes and share them with the college community to help others in their studies.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-search"></i>
+                <h3>Smart Search</h3>
+                <p>Quickly find the notes you need with our powerful search and filtering options.</p>
+            </div>
+        </section>
+
+        <section class="notes-section" id="notes">
+            <h2 class="section-title">Recent Notes</h2>
+            <div class="notes-grid" id="notesGrid">
+                <!-- Notes will be dynamically added here -->
+            </div>
+        </section>
+
+        <section class="upload-section" id="upload">
+            <h2 class="section-title">Upload Your Notes</h2>
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label for="noteTitle">Note Title</label>
+                    <input type="text" id="noteTitle" class="form-control" placeholder="Enter note title" required>
+                </div>
+                <div class="form-group">
+                    <label for="noteSubject">Subject</label>
+                    <select id="noteSubject" class="form-control" required>
+                        <option value="">Select Subject</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Literature">Literature</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="noteContent">Note Content</label>
+                    <textarea id="noteContent" class="form-control" rows="6" placeholder="Enter your notes here..." required></textarea>
+                </div>
+                <button type="submit" class="btn">Upload Note</button>
+            </form>
+        </section>
+
+        <section class="contact-section" id="contact">
+            <h2 class="section-title">Contact Developer</h2>
+            <p style="text-align: center; margin-bottom: 20px;">Have suggestions or need changes? Reach out to the developer!</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>developer@edunotes.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+1 (555) 123-4567</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>University Campus, Tech Building</span>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>EduNotes - Empowering Students Through Shared Knowledge</p>
+        </footer>
+    </div>
+
+    <!-- Note View Modal -->
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <div id="modalContent">
+                <!-- Note content will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample notes data
+        const sampleNotes = [
+            {
+                id: 1,
+                title: "Calculus I - Limits and Continuity",
+                subject: "Mathematics",
+                content: "<h2>Limits and Continuity</h2><p>Limits are fundamental to calculus and mathematical analysis. They are used to define continuity, derivatives, and integrals.</p><h3>Definition of a Limit</h3><p>The limit of a function f(x) as x approaches a is L if we can make f(x) arbitrarily close to L by taking x sufficiently close to a.</p><h3>Continuity</h3><p>A function is continuous at a point if the limit exists at that point, the function is defined at that point, and the limit equals the function value.</p>",
+                date: "2023-10-15",
+                author: "John Doe"
+            },
+            {
+                id: 2,
+                title: "Organic Chemistry - Hydrocarbons",
+                subject: "Chemistry",
+                content: "<h2>Hydrocarbons</h2><p>Hydrocarbons are organic compounds consisting entirely of hydrogen and carbon. They are the principal constituents of petroleum and natural gas.</p><h3>Classification</h3><p>Hydrocarbons are classified as aliphatic (alkanes, alkenes, alkynes) or aromatic (benzene and its derivatives).</p><h3>Properties</h3><p>Physical properties of hydrocarbons depend on molecular size and structure. Boiling points increase with molecular weight.</p>",
+                date: "2023-10-12",
+                author: "Jane Smith"
+            },
+            {
+                id: 3,
+                title: "Data Structures - Binary Trees",
+                subject: "Computer Science",
+                content: "<h2>Binary Trees</h2><p>A binary tree is a hierarchical data structure in which each node has at most two children, referred to as the left child and the right child.</p><h3>Types of Binary Trees</h3><p>1. Full Binary Tree: Every node has 0 or 2 children.<br>2. Complete Binary Tree: All levels are completely filled except possibly the last level.<br>3. Perfect Binary Tree: All internal nodes have two children and all leaves are at the same level.</p><h3>Traversal Methods</h3><p>Inorder: Left, Root, Right<br>Preorder: Root, Left, Right<br>Postorder: Left, Right, Root</p>",
+                date: "2023-10-10",
+                author: "Alex Johnson"
+            },
+            {
+                id: 4,
+                title: "Classical Mechanics - Newton's Laws",
+                subject: "Physics",
+                content: "<h2>Newton's Laws of Motion</h2><p>Newton's laws describe the relationship between a body and the forces acting upon it, and its motion in response to those forces.</p><h3>First Law (Inertia)</h3><p>An object at rest stays at rest and an object in motion stays in motion with the same speed and in the same direction unless acted upon by an unbalanced force.</p><h3>Second Law (F=ma)</h3><p>The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.</p><h3>Third Law (Action-Reaction)</h3><p>For every action, there is an equal and opposite reaction.</p>",
+                date: "2023-10-08",
+                author: "Robert Brown"
+            }
+        ];
+
+        // Initialize notes
+        let notes = JSON.parse(localStorage.getItem('notes')) || sampleNotes;
+
+        // DOM elements
+        const notesGrid = document.getElementById('notesGrid');
+        const uploadForm = document.getElementById('uploadForm');
+        const noteModal = document.getElementById('noteModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalContent = document.getElementById('modalContent');
+        const floatingElements = document.getElementById('floatingElements');
+
+        // Create floating 3D elements
+        function createFloatingElements() {
+            const colors = ['rgba(253, 187, 45, 0.3)', 'rgba(26, 42, 108, 0.3)', 'rgba(178, 31, 31, 0.3)'];
+            
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                
+                const size = Math.random() * 100 + 20;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                element.style.background = color;
+                
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                
+                element.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                element.style.animationDelay = `${Math.random() * 5}s`;
+                
+                floatingElements.appendChild(element);
+            }
+        }
+
+        // Display notes in the grid
+        function displayNotes() {
+            notesGrid.innerHTML = '';
+            
+            notes.forEach(note => {
+                const noteCard = document.createElement('div');
+                noteCard.classList.add('note-card');
+                noteCard.innerHTML = `
+                    <h4>${note.title}</h4>
+                    <p>${note.subject}</p>
+                    <div class="note-meta">
+                        <span>${note.date}</span>
+                        <span>${note.author}</span>
+                    </div>
+                `;
+                
+                noteCard.addEventListener('click', () => openNoteModal(note));
+                notesGrid.appendChild(noteCard);
+            });
+        }
+
+        // Open note in modal
+        function openNoteModal(note) {
+            modalContent.innerHTML = `
+                <h2>${note.title}</h2>
+                <div class="note-meta">
+                    <span><strong>Subject:</strong> ${note.subject}</span>
+                    <span><strong>Date:</strong> ${note.date}</span>
+                    <span><strong>Author:</strong> ${note.author}</span>
+                </div>
+                <div class="note-content">
+                    ${note.content}
+                </div>
+            `;
+            noteModal.style.display = 'flex';
+        }
+
+        // Close modal
+        closeModal.addEventListener('click', () => {
+            noteModal.style.display = 'none';
+        });
+
+        // Handle form submission
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('noteTitle').value;
+            const subject = document.getElementById('noteSubject').value;
+            const content = document.getElementById('noteContent').value;
+            
+            const newNote = {
+                id: notes.length + 1,
+                title,
+                subject,
+                content: `<h2>${title}</h2><p>${content.replace(/\n/g, '</p><p>')}</p>`,
+                date: new Date().toISOString().split('T')[0],
+                author: "You"
+            };
+            
+            notes.unshift(newNote);
+            localStorage.setItem('notes', JSON.stringify(notes));
+            
+            displayNotes();
+            uploadForm.reset();
+            
+            // Show success message
+            alert('Note uploaded successfully!');
+        });
+
+        // Disable right-click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable copy-paste
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('paste', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('cut', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Initialize the page
+        function init() {
+            createFloatingElements();
+            displayNotes();
+        }
+
+        // Run initialization when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
