@@ -132,6 +132,12 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #fdbb2d;
+            color: #fdbb2d;
+        }
+
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -264,6 +270,95 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: #fdbb2d;
+            background: rgba(253, 187, 45, 0.1);
+        }
+
+        .file-upload-label i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #fdbb2d;
+        }
+
+        .file-upload-label span {
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .upload-preview {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .upload-preview.active {
+            display: block;
+        }
+
+        .preview-file {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .preview-file i {
+            font-size: 30px;
+            color: #fdbb2d;
+        }
+
+        .preview-info {
+            flex: 1;
+        }
+
+        .preview-info h5 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .preview-info p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
         .contact-section {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
@@ -329,6 +424,11 @@
             animation: modalAppear 0.5s ease;
         }
 
+        .modal-wide {
+            max-width: 95%;
+            width: 95%;
+        }
+
         @keyframes modalAppear {
             0% {
                 transform: perspective(1000px) rotateY(90deg) scale(0.5);
@@ -361,6 +461,43 @@
 
         .note-content p {
             margin-bottom: 15px;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .pdf-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .pdf-controls button {
+            background: #fdbb2d;
+            color: #1a2a6c;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pdf-controls button:hover {
+            background: #ffcc4d;
+        }
+
+        .pdf-controls span {
+            font-weight: 600;
         }
 
         .floating-elements {
@@ -399,6 +536,25 @@
             user-select: none;
         }
 
+        /* Success message */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 3000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .success-message.show {
+            transform: translateX(0);
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             header {
@@ -421,6 +577,17 @@
             .features {
                 grid-template-columns: 1fr;
             }
+
+            .modal-wide {
+                max-width: 98%;
+                width: 98%;
+                padding: 15px;
+            }
+
+            .pdf-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -430,6 +597,11 @@
     
     <!-- Copyright -->
     <div class="copyright">© 2023 EduNotes. All rights reserved.</div>
+    
+    <!-- Success Message -->
+    <div class="success-message" id="successMessage">
+        <i class="fas fa-check-circle"></i> Note uploaded successfully!
+    </div>
     
     <!-- Floating 3D elements -->
     <div class="floating-elements" id="floatingElements"></div>
@@ -453,7 +625,7 @@
         <section class="hero">
             <h1>College Notes Made Simple</h1>
             <p>Access, share, and collaborate on study materials with fellow students. Enhance your learning experience with our interactive platform.</p>
-            <a href="#notes" class="btn">Explore Notes</a>
+            <a href="#upload" class="btn">Upload Notes</a>
         </section>
 
         <section class="features">
@@ -501,8 +673,30 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="noteContent">Note Content</label>
-                    <textarea id="noteContent" class="form-control" rows="6" placeholder="Enter your notes here..." required></textarea>
+                    <label for="noteDescription">Description</label>
+                    <textarea id="noteDescription" class="form-control" rows="3" placeholder="Brief description of your notes"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Upload File</label>
+                    <div class="file-upload">
+                        <label class="file-upload-label" for="fileInput">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Click to upload or drag and drop<br>PDF, DOC, TXT, or Images (max 10MB)</span>
+                        </label>
+                        <input type="file" id="fileInput" class="file-upload-input" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-preview" id="uploadPreview">
+                        <div class="preview-file">
+                            <i class="fas fa-file-pdf"></i>
+                            <div class="preview-info">
+                                <h5 id="previewFileName">File Name</h5>
+                                <p id="previewFileSize">File Size</p>
+                            </div>
+                            <button type="button" class="remove-file" id="removeFile">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" class="btn">Upload Note</button>
             </form>
@@ -542,6 +736,19 @@
         </div>
     </div>
 
+    <!-- PDF Viewer Modal -->
+    <div class="modal" id="pdfModal">
+        <div class="modal-content modal-wide">
+            <span class="close-modal" id="closePdfModal">&times;</span>
+            <div class="pdf-controls">
+                <button id="downloadPdf"><i class="fas fa-download"></i> Download</button>
+                <span id="pdfTitle">PDF Document</span>
+                <button id="printPdf"><i class="fas fa-print"></i> Print</button>
+            </div>
+            <iframe class="pdf-viewer" id="pdfViewer" src="about:blank"></iframe>
+        </div>
+    </div>
+
     <script>
         // Sample notes data
         const sampleNotes = [
@@ -549,33 +756,60 @@
                 id: 1,
                 title: "Calculus I - Limits and Continuity",
                 subject: "Mathematics",
+                description: "Comprehensive notes on limits, continuity, and their applications in calculus.",
                 content: "<h2>Limits and Continuity</h2><p>Limits are fundamental to calculus and mathematical analysis. They are used to define continuity, derivatives, and integrals.</p><h3>Definition of a Limit</h3><p>The limit of a function f(x) as x approaches a is L if we can make f(x) arbitrarily close to L by taking x sufficiently close to a.</p><h3>Continuity</h3><p>A function is continuous at a point if the limit exists at that point, the function is defined at that point, and the limit equals the function value.</p>",
                 date: "2023-10-15",
-                author: "John Doe"
+                author: "John Doe",
+                file: {
+                    name: "calculus_limits.pdf",
+                    size: "2.4 MB",
+                    type: "pdf",
+                    url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                }
             },
             {
                 id: 2,
                 title: "Organic Chemistry - Hydrocarbons",
                 subject: "Chemistry",
+                description: "Detailed notes on hydrocarbon classification, properties, and reactions.",
                 content: "<h2>Hydrocarbons</h2><p>Hydrocarbons are organic compounds consisting entirely of hydrogen and carbon. They are the principal constituents of petroleum and natural gas.</p><h3>Classification</h3><p>Hydrocarbons are classified as aliphatic (alkanes, alkenes, alkynes) or aromatic (benzene and its derivatives).</p><h3>Properties</h3><p>Physical properties of hydrocarbons depend on molecular size and structure. Boiling points increase with molecular weight.</p>",
                 date: "2023-10-12",
-                author: "Jane Smith"
+                author: "Jane Smith",
+                file: {
+                    name: "organic_chemistry.pdf",
+                    size: "3.1 MB",
+                    type: "pdf",
+                    url: "https://www.africau.edu/images/default/sample.pdf"
+                }
             },
             {
                 id: 3,
                 title: "Data Structures - Binary Trees",
                 subject: "Computer Science",
+                description: "Complete guide to binary trees with examples and implementation details.",
                 content: "<h2>Binary Trees</h2><p>A binary tree is a hierarchical data structure in which each node has at most two children, referred to as the left child and the right child.</p><h3>Types of Binary Trees</h3><p>1. Full Binary Tree: Every node has 0 or 2 children.<br>2. Complete Binary Tree: All levels are completely filled except possibly the last level.<br>3. Perfect Binary Tree: All internal nodes have two children and all leaves are at the same level.</p><h3>Traversal Methods</h3><p>Inorder: Left, Root, Right<br>Preorder: Root, Left, Right<br>Postorder: Left, Right, Root</p>",
                 date: "2023-10-10",
-                author: "Alex Johnson"
+                author: "Alex Johnson",
+                file: {
+                    name: "binary_trees.docx",
+                    size: "1.8 MB",
+                    type: "doc"
+                }
             },
             {
                 id: 4,
                 title: "Classical Mechanics - Newton's Laws",
                 subject: "Physics",
+                description: "Fundamental principles of classical mechanics with practical examples.",
                 content: "<h2>Newton's Laws of Motion</h2><p>Newton's laws describe the relationship between a body and the forces acting upon it, and its motion in response to those forces.</p><h3>First Law (Inertia)</h3><p>An object at rest stays at rest and an object in motion stays in motion with the same speed and in the same direction unless acted upon by an unbalanced force.</p><h3>Second Law (F=ma)</h3><p>The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.</p><h3>Third Law (Action-Reaction)</h3><p>For every action, there is an equal and opposite reaction.</p>",
                 date: "2023-10-08",
-                author: "Robert Brown"
+                author: "Robert Brown",
+                file: {
+                    name: "newton_laws.pdf",
+                    size: "2.7 MB",
+                    type: "pdf",
+                    url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+                }
             }
         ];
 
@@ -588,7 +822,19 @@
         const noteModal = document.getElementById('noteModal');
         const closeModal = document.getElementById('closeModal');
         const modalContent = document.getElementById('modalContent');
+        const pdfModal = document.getElementById('pdfModal');
+        const closePdfModal = document.getElementById('closePdfModal');
+        const pdfViewer = document.getElementById('pdfViewer');
+        const pdfTitle = document.getElementById('pdfTitle');
+        const downloadPdf = document.getElementById('downloadPdf');
+        const printPdf = document.getElementById('printPdf');
         const floatingElements = document.getElementById('floatingElements');
+        const fileInput = document.getElementById('fileInput');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const previewFileName = document.getElementById('previewFileName');
+        const previewFileSize = document.getElementById('previewFileSize');
+        const removeFile = document.getElementById('removeFile');
+        const successMessage = document.getElementById('successMessage');
 
         // Create floating 3D elements
         function createFloatingElements() {
@@ -625,6 +871,7 @@
                 noteCard.innerHTML = `
                     <h4>${note.title}</h4>
                     <p>${note.subject}</p>
+                    <p style="font-size: 12px; margin-bottom: 10px;">${note.description}</p>
                     <div class="note-meta">
                         <span>${note.date}</span>
                         <span>${note.author}</span>
@@ -648,14 +895,86 @@
                 <div class="note-content">
                     ${note.content}
                 </div>
+                ${note.file ? `<div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <h3 style="color: #fdbb2d; margin-bottom: 10px;">Attached File</h3>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-file-pdf" style="font-size: 30px; color: #fdbb2d;"></i>
+                        <div>
+                            <h4 style="margin-bottom: 5px;">${note.file.name}</h4>
+                            <p style="font-size: 14px; opacity: 0.7;">${note.file.size}</p>
+                        </div>
+                        ${note.file.type === 'pdf' ? `<button class="btn" style="margin-left: auto;" onclick="openPdfViewer('${note.file.url}', '${note.title}')">
+                            <i class="fas fa-eye"></i> View PDF
+                        </button>` : ''}
+                    </div>
+                </div>` : ''}
             `;
             noteModal.style.display = 'flex';
         }
 
-        // Close modal
+        // Open PDF viewer
+        function openPdfViewer(pdfUrl, title) {
+            pdfViewer.src = pdfUrl;
+            pdfTitle.textContent = title;
+            pdfModal.style.display = 'flex';
+            noteModal.style.display = 'none';
+        }
+
+        // Close modals
         closeModal.addEventListener('click', () => {
             noteModal.style.display = 'none';
         });
+
+        closePdfModal.addEventListener('click', () => {
+            pdfModal.style.display = 'none';
+            pdfViewer.src = 'about:blank';
+        });
+
+        // PDF controls
+        downloadPdf.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = pdfViewer.src;
+            link.download = pdfTitle.textContent + '.pdf';
+            link.click();
+        });
+
+        printPdf.addEventListener('click', () => {
+            const pdfWindow = window.open(pdfViewer.src);
+            pdfWindow.print();
+        });
+
+        // Handle file upload preview
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                
+                // Check file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size exceeds 10MB limit. Please choose a smaller file.');
+                    this.value = '';
+                    return;
+                }
+                
+                previewFileName.textContent = file.name;
+                previewFileSize.textContent = fileSize;
+                uploadPreview.classList.add('active');
+            }
+        });
+
+        // Remove file from preview
+        removeFile.addEventListener('click', function() {
+            fileInput.value = '';
+            uploadPreview.classList.remove('active');
+        });
+
+        // Show success message
+        function showSuccessMessage() {
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 3000);
+        }
 
         // Handle form submission
         uploadForm.addEventListener('submit', function(e) {
@@ -663,15 +982,29 @@
             
             const title = document.getElementById('noteTitle').value;
             const subject = document.getElementById('noteSubject').value;
-            const content = document.getElementById('noteContent').value;
+            const description = document.getElementById('noteDescription').value;
+            const file = fileInput.files[0];
+            
+            let fileData = null;
+            if (file) {
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                const fileType = file.name.split('.').pop();
+                fileData = {
+                    name: file.name,
+                    size: fileSize,
+                    type: fileType
+                };
+            }
             
             const newNote = {
                 id: notes.length + 1,
                 title,
                 subject,
-                content: `<h2>${title}</h2><p>${content.replace(/\n/g, '</p><p>')}</p>`,
+                description,
+                content: `<h2>${title}</h2><p>${description}</p>`,
                 date: new Date().toISOString().split('T')[0],
-                author: "You"
+                author: "You",
+                file: fileData
             };
             
             notes.unshift(newNote);
@@ -679,9 +1012,15 @@
             
             displayNotes();
             uploadForm.reset();
+            uploadPreview.classList.remove('active');
             
             // Show success message
-            alert('Note uploaded successfully!');
+            showSuccessMessage();
+            
+            // Scroll to notes section
+            document.querySelector('#notes').scrollIntoView({
+                behavior: 'smooth'
+            });
         });
 
         // Disable right-click
